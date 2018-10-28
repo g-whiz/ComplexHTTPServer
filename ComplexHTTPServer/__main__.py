@@ -13,6 +13,7 @@ except ImportError:
 
 import sys
 import os
+import argparse
 
 # The absolute path of the directoy for this file:
 _ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -20,13 +21,15 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 class ThreadingSimpleServer(SocketServer.ThreadingMixIn,BaseHTTPServer.HTTPServer):
     pass
 
-if sys.argv[1:]:
-    port = int(sys.argv[1])
-else:
-    port = 8000
+parser = argparse.ArgumentParser('ComplexHTTPServer: now with more threads!')
+parser.add_argument('port', metavar='PORT', type=int, default=8000,
+                    help='The port to serve on.')
+parser.add_argument('--host', dest='ip', type=str, default='127.0.0.1',
+                    help='The IP address to serve on.')
+config = parser.parse_args()
 
-server = ThreadingSimpleServer(('', port), SimpleHTTPServer.SimpleHTTPRequestHandler)
-print("Serving HTTP on 0.0.0.0 port",port,"...")
+server = ThreadingSimpleServer((config.ip, config.port), SimpleHTTPServer.SimpleHTTPRequestHandler)
+print("Serving HTTP on {}:{}".format(config.ip, config.port))
 
 try:
     while 1:
